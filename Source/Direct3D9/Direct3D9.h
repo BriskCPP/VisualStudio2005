@@ -183,6 +183,79 @@ namespace Direct3D
 			D3DXVECTOR3 rotate(D3DXVECTOR3 vector,D3DXVECTOR3 rotation);
 		}
 
+		namespace mesh
+		{
+			class MeshContainer
+			{
+				//如果考虑可以由Text创建MeshContainer
+				//可以创建一个友元函数
+			public:
+				//将Mesh平移到原点
+				//不做rotation和scale
+				//bool toOrigin();
+				//我现在觉得这个不需要
+				//默认绘制第一个子集
+				//是D3DXMesh的Decorator
+				virtual HRESULT DrawSubset(DWORD attributeId = 0);
+			protected:
+				//创建一个空的MeshContainer
+				MeshContainer(ID3DXMesh *d3dxMesh = NULL);
+				//在析构函数中Release
+				~MeshContainer();
+				//设置Mesh  只能由友元类和友元函数访问
+				//center取在外接长方体的体积中心
+				//在这个类里不包含transform的信息
+
+				//定义
+				ID3DXMesh *d3dxMesh;
+			};
+			namespace text
+			{
+				struct TextVertex
+				{
+					float x,y,z;
+					float nx,ny,nz;
+					//DWORD Vertex::FVF = D3DFVF_XYZ | D3DFVF_NORMAL对应的顶点格式
+					//之所以知道从Text中获取的是这样的顶点格式，
+					//就是调试输出了18也就是0x12，所以就是D3DFVF_XYZ | D3DFVF_NORMAL
+				};
+
+				//应该保持MeshContainer的职能单一
+				//关于文字类的，都在派生的类中处理
+				class TextMesh:public Direct3D::v9::mesh::MeshContainer
+				{
+					//我也不知道这里是不是应该用继承
+					//还是应该用装饰器模式
+					//这是一个设计上的问题，但是我还是感觉更像是应该用继承
+				private:
+
+					//下面定义了三个center translation rotation 和scale三个参数
+					D3DXVECTOR3 center,translation,rotation;
+					//需要定义一个单独的Cube类来标识吗？
+					//不，应该将scale和边长组合成一个内部类，统一处理
+					class Scale
+					{
+					private:
+						D3DXVECTOR3 scale,sideLength;
+					public:
+						Scale();//作为内部类必须有默认构造函数
+						Scale(D3DXVECTOR3 sideLength,D3DXVECTOR3 scale = D3DXVECTOR3(1.0f,1.0f,1.0f));
+						D3DXVECTOR3 setByScale(D3DXVECTOR3 scale);
+						D3DXVECTOR3 setBySideLength(D3DXVECTOR3 sideLength);
+						D3DXVECTOR3 getScale();
+						D3DXVECTOR3 getSideLength();
+					} scale;
+				public:
+					static int convertStringToWideChar(std::string toConvert,LPWSTR *result);
+					static int convertMultiByteToWideChar(const char *toConvert,LPWSTR *result);
+
+					TextMesh(IDirect3DDevice9 *device,std::string content,std::string font,int weight = 200);
+
+					//HRESULT DrawSubset(DWORD attributeId = 0);//覆盖MeshContainer基类的DrawSubSet，以应用变换后再输出
+				};
+			}
+		}
+
 		namespace text
 		{
 			//用于优化文字渲染输出
@@ -199,8 +272,6 @@ namespace Direct3D
 			{
 			public:
 				Text(IDirect3DDevice9 *device,std::string content,std::string font,int weight = 200);
-				Text(IDirect3DDevice9 *device,std::string content);//采用默认字符集，我这里设定为微软雅黑
-				//上面这个函数暂未实现
 				~Text();
 
 				ID3DXMesh *getMesh();//获得D3DX内置的mesh对象，如果有变换，会先应用变换

@@ -4,6 +4,8 @@ namespace Direct3D
 {
 	namespace v9
 	{
+		//the following contents are deprecated
+		/////////////////////////////////////////////////////////////////////////
 		namespace text
 		{
 			Text::Text(IDirect3DDevice9 *device,std::string content,std::string font,int weight /* = 200 */)
