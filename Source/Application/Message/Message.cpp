@@ -411,8 +411,8 @@ namespace Application
 
 				return true;
 			}
-
-			std::list<UINT32> charArrayTo32bitDataList(char charArray[],UINT16 charArrayLength)
+			/////////////////////////////////////////////////////////////////
+			std::list<UINT32> charArrayTo32bitDataList(const char charArray[],UINT16 charArrayLength)
 			{
 				std::list<UINT32> dataList;
 				if(charArrayLength%4 != 0) return dataList;
@@ -451,6 +451,28 @@ namespace Application
 					}
 				}
 				return dataList;
+			}
+            std::list<UINT8> split32bitDataListTo8bitDataList(std::list<UINT32> dataList)
+			{
+                std::list<UINT8> result;
+				result.clear();
+				
+				//牢记：低位在前，高位在后
+				for(std::list<UINT32>::iterator dataListIterator = dataList.begin();
+					dataListIterator != dataList.end();dataListIterator++
+					)
+				{
+					//唉…………
+                    UINT8 temp = (UINT8)((*dataListIterator)&0x000000ff);
+                    result.push_back(temp);
+                    temp = (UINT8)(((*dataListIterator)&0x0000ff00)>>8);
+                    result.push_back(temp);
+                    temp = (UINT8)(((*dataListIterator)&0x00ff0000)>>16);
+                    result.push_back(temp);
+                    temp = (UINT8)(((*dataListIterator)&0xff000000)>>24);
+                    result.push_back(temp);
+				}
+				return result;
 			}
 			//////////////////////////////////////////////////////////////////////////////
 			std::list<UINT16> convertFloatTo16bitDataList(float data)

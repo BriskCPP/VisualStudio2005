@@ -3,6 +3,7 @@
 #include <Windows.h>
 
 #include <list>
+#include <string>
 
 namespace Application
 {
@@ -39,7 +40,8 @@ namespace Application
 			bool convert32bitDataListToMessage(std::list<UINT32> sourceList,struct Application::Message::Message *destination);
 			bool convert32bitDataArrayToMessage(UINT32 *sourceData,UINT8 sourceLength,struct Application::Message::Message *destination);
 
-			std::list<UINT32> charArrayTo32bitDataList(char charArray[],UINT16 charArrayLength);
+            std::list<UINT32> charArrayTo32bitDataList(const char charArray[],UINT16 charArrayLength);
+            std::list<UINT8> split32bitDataListTo8bitDataList(std::list<UINT32> dataList);
 
 			std::list<UINT16> convertFloatTo16bitDataList(float data);
 			std::list<UINT16> convertDoubleTo16bitDataList(double data);
