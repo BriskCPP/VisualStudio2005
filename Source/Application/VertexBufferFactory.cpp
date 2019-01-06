@@ -5,14 +5,14 @@ namespace Application
 {
 	namespace vertexBufferFactory
 	{
-		Direct3D::v9::primitive::buffer::VertexBuffer<struct Direct3D::v9::primitive::vertex::VertexWithColor>
+		Direct3D::v9::resource::primitive::buffer::VertexBuffer<struct Direct3D::v9::resource::primitive::vertex::VertexWithColor>
 			getVertexBuffer(
 			IDirect3DDevice9 *device,
 			std::list<Application::DisplayComponent *> componentList
 			)
 		{
-			using Direct3D::v9::primitive::buffer::VertexBuffer;
-			using Direct3D::v9::primitive::vertex::VertexWithColor;
+			using Direct3D::v9::resource::primitive::buffer::VertexBuffer;
+			using Direct3D::v9::resource::primitive::vertex::VertexWithColor;
 
 			std::list<struct VertexWithColor> allVertexList;
 

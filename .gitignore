@@ -1,4 +1,4 @@
-# Visual Studio Solution User Options (.suo)
+﻿# Visual Studio Solution User Options (.suo)
 *.suo
 # Per-User Project Options File (.user)
 *.user
@@ -13,6 +13,10 @@
 *.idb
 # Program Debug Database (.pdb)
 *.pdb
+# Incremental Linker File (.ilk)
+*.ilk
+# Compiled Resource Script (.res)
+*.res
 # 这两个文件和上面的往往同在一个目录
 *.dep
 *.manifest

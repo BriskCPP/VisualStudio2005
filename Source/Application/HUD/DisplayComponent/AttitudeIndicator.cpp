@@ -16,9 +16,9 @@ namespace Application
 				this->Z = Z;
 			}
 
-			std::list<struct Direct3D::v9::primitive::vertex::VertexWithColor> AttitudeIndicator::getOutputVertexList()
+			std::list<struct Direct3D::v9::resource::primitive::vertex::VertexWithColor> AttitudeIndicator::getOutputVertexList()
 			{
-				std::list<struct Direct3D::v9::primitive::vertex::VertexWithColor> vertexList;
+				std::list<struct Direct3D::v9::resource::primitive::vertex::VertexWithColor> vertexList;
 				double p = this->pitch*((float)this->R/(D3DX_PI/9));
 				//p指的是pitch转换为空间中的长度，这里定义了视域在-20°到+20°
 				float d = ((float)this->R)/4;//d指的是相邻两条平行线在空间中的距离

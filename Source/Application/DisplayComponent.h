@@ -3,7 +3,7 @@
 #include "../Direct3D9/Direct3D9.h"
 #include <list>
 
-using Direct3D::v9::primitive::vertex::VertexWithColor;
+using Direct3D::v9::resource::primitive::vertex::VertexWithColor;
 
 namespace Application
 {
