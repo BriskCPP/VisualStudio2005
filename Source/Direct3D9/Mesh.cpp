@@ -269,7 +269,7 @@ namespace Direct3D
 				{
 					this->d3dxMesh = d3dxMesh;
 					//向资源管理去添加这个……mesh，以在一帧结束时释放
-					Direct3D::v9::resource::OneFrameLifecycleResource::getInstance()->addMesh(device,d3dxMesh);
+					Direct3D::v9::resource::OneFrameLifecycleResource::getInstance()->addResource(device,d3dxMesh);
 					this->flexibleVertexFormat = FVF;
 					this->device = device;
 				}
@@ -279,7 +279,7 @@ namespace Direct3D
 					ID3DXMesh *clonedMesh = NULL;
 					this->d3dxMesh->CloneMeshFVF(this->d3dxMesh->GetOptions(),this->flexibleVertexFormat,this->device,&clonedMesh);
 					//向资源管理去添加这个……mesh，以在一帧结束时释放
-					Direct3D::v9::resource::OneFrameLifecycleResource::getInstance()->addMesh(device,clonedMesh);
+					Direct3D::v9::resource::OneFrameLifecycleResource::getInstance()->addResource(device,clonedMesh);
 					return clonedMesh;
 				}
 			}

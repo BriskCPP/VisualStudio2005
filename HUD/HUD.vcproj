@@ -354,6 +354,10 @@
 				<Filter
 					Name="HUD"
 					>
+					<File
+						RelativePath="..\Source\Application\HUD\AttitudeIndicator.h"
+						>
+					</File>
 					<Filter
 						Name="DisplayComponent"
 						>

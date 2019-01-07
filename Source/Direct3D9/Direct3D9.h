@@ -65,12 +65,19 @@ namespace Direct3D
 				void clear(IDirect3DDevice9 *device);//用于在一帧结束后，清空
 
 				//返回新的大小
-				UINT64 addMesh(IDirect3DDevice9 *device,ID3DXMesh *mesh);
+				UINT64 addResource(IDirect3DDevice9 *device,ID3DXMesh *mesh);
+				//返回新的大小
+				UINT64 addResource(IDirect3DDevice9 *device,IDirect3DVertexBuffer9 *vertexBuffer);
 
 			private:
 				std::map<IDirect3DDevice9 *,std::list<ID3DXMesh *>> mesh;
-				//还要添加VertexBuffer的
+				std::map<IDirect3DDevice9 *,std::list<IDirect3DVertexBuffer9 *>> vertexBuffer;
 			};
+
+			namespace vector
+			{
+				D3DXVECTOR3 rotate(D3DXVECTOR3 vector,D3DXVECTOR3 rotation);
+			}
 
 			namespace primitive
 			{
@@ -84,6 +91,133 @@ namespace Direct3D
 						static const DWORD flexibleVectorFormat;
 					};
 				}
+
+				class Primitive;//所有Primitive必须继承的基类  用于提供统一的void render()方法
+
+				template<typename Vertex>
+				class LineList
+				{
+				private:
+					UINT vertexSize;
+					IDirect3DDevice9 *device;
+					IDirect3DVertexBuffer9 *d3dVertexBuffer;
+
+					D3DXVECTOR3 center;
+					D3DXVECTOR3 translation;
+					D3DXVECTOR3 rotation;
+					D3DXVECTOR3 scale;
+				public:
+					LineList(IDirect3DDevice9 *device,
+						std::list<std::pair<Vertex,Vertex>> lineList,
+						DWORD usage = D3DUSAGE_WRITEONLY,
+						D3DPOOL pool = D3DPOOL_MANAGED
+						)
+					{
+						this->center = D3DXVECTOR3(0,0,0);
+						this->translation = D3DXVECTOR3(0,0,0);
+						this->rotation = D3DXVECTOR3(0,0,0);
+						this->scale = D3DXVECTOR3(1.0f,1.0f,1.0f);
+
+						this->device = device;
+
+						this->vertexSize = 2*(UINT)lineList.size();
+						//×2是因为这个list是元素为std::pair<Vertex,Vertex>的list
+						
+						device->CreateVertexBuffer(
+							(this->vertexSize)*sizeof(Vertex),
+							usage,Vertex::flexibleVectorFormat,
+							pool,&(this->d3dVertexBuffer),0);
+						
+						//向资源管理中添加这个资源，以在帧结束时自动释放
+						Direct3D::v9::resource::OneFrameLifecycleResource::getInstance()->addResource(device,this->d3dVertexBuffer);
+
+						Vertex *vertexPointer = NULL;
+						this->d3dVertexBuffer->Lock(0,0,(void **)&vertexPointer,0);
+
+						UINT index = 0;
+						for(std::list<std::pair<Vertex,Vertex>>::iterator lineListIterator = lineList.begin();
+							lineListIterator != lineList.end();lineListIterator ++
+							)
+						{
+							*(vertexPointer + index) = lineListIterator->first;
+							++index;
+							*(vertexPointer + index) = lineListIterator->second;
+							++index;
+						}
+						this->d3dVertexBuffer->Unlock();
+					}
+
+					void render()
+					{
+						//apply transform
+						//0.apply Translation
+						Vertex *vertexPointer = NULL;
+						this->d3dVertexBuffer->Lock(0,0,(void **)&vertexPointer,0);
+
+						for(UINT index = 0;index < this->vertexSize;index ++)
+						{
+							vertexPointer[index].x += this->translation.x;
+							vertexPointer[index].y += this->translation.y;
+							vertexPointer[index].z += this->translation.z;
+						}
+						this->center += this->translation;//平移中心
+
+						//1.apply rotation
+						for(UINT index = 0;index < this->vertexSize;index ++)
+						{
+							D3DXVECTOR3 relative;//相对于旋转和缩放中心的相对矢量
+							relative.x = vertexPointer[index].x - this->center.x;
+							relative.y = vertexPointer[index].y - this->center.y;
+							relative.z = vertexPointer[index].z - this->center.z;
+							//对相对矢量进行旋转
+							D3DXVECTOR3 rotated = Direct3D::v9::resource::vector::rotate(relative,this->rotation);
+
+							vertexPointer[index].x = this->center.x + rotated.x;
+							vertexPointer[index].y = this->center.y + rotated.y;
+							vertexPointer[index].z = this->center.z + rotated.z;
+						}
+
+						//2.apply Scale
+						for(UINT index = 0;index < this->vertexSize;index ++)
+						{
+							D3DXVECTOR3 relative;//相对于旋转和缩放中心的相对矢量
+							relative.x = vertexPointer[index].x - this->center.x;
+							relative.y = vertexPointer[index].y - this->center.y;
+							relative.z = vertexPointer[index].z - this->center.z;
+
+							vertexPointer[index].x = this->center.x + relative.x*this->scale.x;
+							vertexPointer[index].y = this->center.y + relative.y*this->scale.y;
+							vertexPointer[index].z = this->center.z + relative.z*this->scale.z;
+						}
+						this->d3dVertexBuffer->Unlock();
+
+						//3.render
+						this->device->SetStreamSource(0,this->d3dVertexBuffer,0,sizeof(Vertex));
+						this->device->SetFVF(Vertex::flexibleVectorFormat);
+						this->device->DrawPrimitive(D3DPT_LINELIST,0,this->vertexSize/2);
+					}
+
+					void setCenter(D3DXVECTOR3 center)
+					{
+						this->center = center;
+					}
+					void setTranslation(D3DXVECTOR3 translation)
+					{
+						this->translation = translation;
+					}
+					void setRotation(D3DXVECTOR3 rotation)
+					{
+						this->rotation = rotation;
+					}
+					void setScale(D3DXVECTOR3 scale)
+					{
+						this->scale = scale;
+					}
+				};
+
+
+				//the following are deprecated
+				////////////////////////////////////////
 				namespace buffer
 				{
 					template<typename Vertex>
@@ -150,62 +284,11 @@ namespace Direct3D
 						IDirect3DVertexBuffer9 *d3dVectorBuffer;
 						UINT length;
 					};
-
-					template<typename IndexType>
-					class IndexBuffer
-					{
-					public:
-						IndexBuffer(
-							IDirect3DDevice9 *device,UINT length,
-							DWORD usage = D3DUSAGE_WRITEONLY,
-							D3DFORMAT format = D3DFMT_INDEX32,
-							D3DPOOL pool = D3DPOOL_MANAGED
-							)
-						{
-							length = length>1048576?1048576:length;
-							switch(sizeof(IndexType))
-							{
-							case 2:
-								format = D3DFMT_INDEX16;
-								device->CreateIndexBuffer(length*sizeof(IndexType),usage,format,pool,&(this->d3dIndexBuffer),0);
-								break;
-							case 4:
-								format = D3DFMT_INDEX32;
-								device->CreateIndexBuffer(length*sizeof(IndexType),usage,format,pool,&(this->d3dIndexBuffer),0);
-								break;
-							default:
-								device->CreateIndexBuffer(length*sizeof(IndexType),usage,format,pool,&(this->d3dIndexBuffer),0);
-								break;
-							}
-							this->length = length;
-						}
-						UINT getLength()
-						{
-							return this->length;
-						}
-
-						IndexType *lock()
-						{
-							IndexType *indexType;
-							this->d3dIndexBuffer->Lock(0,0,(void **)&indexType,0);
-							return indexType;
-						}
-						void unlock()
-						{
-							this->d3dIndexBuffer->Unlock();
-						}
-
-					private:
-						IDirect3DIndexBuffer9 *d3dIndexBuffer;
-						UINT length;
-					};
+					//////////////////////////////////////////////////////////
 				}
 			}
 
-			namespace vector
-			{
-				D3DXVECTOR3 rotate(D3DXVECTOR3 vector,D3DXVECTOR3 rotation);
-			}
+			
 
 
 			namespace mesh
@@ -301,7 +384,6 @@ namespace Direct3D
 						static int convertStringToWideChar(std::string toConvert,LPWSTR *result);
 						static int convertMultiByteToWideChar(const char *toConvert,LPWSTR *result);
 
-						//todo
 						void setTranslation(D3DXVECTOR3 translation);
 						void setRotation(D3DXVECTOR3 rotation);
 						void setScale(D3DXVECTOR3 scale);
