@@ -335,41 +335,17 @@
 					RelativePath="..\Source\Application\application.h"
 					>
 				</File>
-				<File
-					RelativePath="..\Source\Application\DisplayComponent.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Source\Application\DisplayComponent.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Source\Application\VertexBufferFactory.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Source\Application\VertexBufferFactory.h"
-					>
-				</File>
 				<Filter
 					Name="HUD"
 					>
 					<File
+						RelativePath="..\Source\Application\HUD\AttitudeIndicator.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\Source\Application\HUD\AttitudeIndicator.h"
 						>
 					</File>
-					<Filter
-						Name="DisplayComponent"
-						>
-						<File
-							RelativePath="..\Source\Application\HUD\DisplayComponent\AttitudeIndicator.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\Source\Application\HUD\DisplayComponent\AttitudeIndicator.h"
-							>
-						</File>
-					</Filter>
 					<Filter
 						Name="Thread"
 						>
