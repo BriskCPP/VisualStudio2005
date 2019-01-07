@@ -389,7 +389,7 @@ namespace Direct3D
 						void setScale(D3DXVECTOR3 scale);
 						void setSideLength(D3DXVECTOR3 sideLength,bool keepAspectRatio = true);
 						//之所以要传递device，是因为要复制原有的Mesh，不在原始生成（并平移到原点）的Mesh上直接Draw
-						void render(IDirect3DDevice9 *device);//渲染
+						void render();//渲染
 					};
 				}
 			}

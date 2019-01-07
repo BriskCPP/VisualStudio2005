@@ -1,6 +1,9 @@
 #include "./AttitudeIndicator.h"
 
 #include <list>
+#include <cstdlib>
+#include <string>
+
 #include <cmath>
 
 namespace Application
@@ -69,6 +72,35 @@ namespace Application
 
 				horizontalLineVertexList.push_back(std::pair<struct VertexWithColor,struct VertexWithColor>(vertexArray[0],vertexArray[1]));
 				horizontalLineVertexList.push_back(std::pair<struct VertexWithColor,struct VertexWithColor>(vertexArray[2],vertexArray[3]));
+
+				///////////////////////////////////////////////
+				//the following part is aimed at generating and rendering Text Mesh
+
+				//首先生成文字;
+
+				std::string currentDegreeText("");
+				
+				char charArray[64];
+				sprintf_s(charArray,"%d",(int)(divIndex * this->degreePerDivision));
+				currentDegreeText.append(charArray);
+
+
+
+				Direct3D::v9::resource::mesh::text::TextMesh currentDegreeTextMesh = 
+					Direct3D::v9::resource::mesh::MeshFactory::createTextMesh(device,currentDegreeText,std::string("Microsoft YaHei"));
+				
+				//因为TextMesh没有针对姿态显示仪的单独优化，所以必须单独设定Translation   其实也不难
+				D3DXVECTOR3 translationWithoutRotation;
+				translationWithoutRotation.x = (float)(-0.1*(float)this->R);
+				translationWithoutRotation.y = (float)(-pitch + divIndex*(float)(lengthPerDegree*this->degreePerDivision));
+				translationWithoutRotation.z = (float)this->Z;
+
+				currentDegreeTextMesh.setTranslation(Direct3D::v9::resource::vector::rotate(
+					translationWithoutRotation, D3DXVECTOR3(0.0f,0.0f,((float)this->roll/180)*D3DX_PI)));
+				currentDegreeTextMesh.setScale(D3DXVECTOR3(100,100,0.001f));
+				currentDegreeTextMesh.setRotation(D3DXVECTOR3(0.0f,0.0f,((float)this->roll/180)*D3DX_PI));
+				//还没有设置缩放
+				currentDegreeTextMesh.render();
 			}
 
 
