@@ -12,12 +12,11 @@
 #include "threads.h"
 
 #include "../../Message/message.h"
+#include "../ParameterStore.h"
 
 #include <map>
 #include <queue>
 #include <list>
-
-#include <sstream>//stringstream 在这里用来把UINT32转换为string,调试用
 
 namespace Application
 {
@@ -137,6 +136,9 @@ namespace Application
 									std::list<UINT32> current32bitDataList = 
 										Application::Message::Util::charArrayTo32bitDataList(receivedData,receptionFlag);
 
+									Application::HUD::ParameterStore::getInstance()->update(current32bitDataList);
+
+									/*
 									for(std::list<UINT32>::iterator dataListIterator = current32bitDataList.begin();
 										dataListIterator != current32bitDataList.end();dataListIterator++
 										)
@@ -149,6 +151,7 @@ namespace Application
 
 										MessageBoxA(0,debugMessage.c_str(),0,0);
 									}
+									*/
 								}
 							}
 							if (receptionFlag == 0)

@@ -27,6 +27,20 @@ namespace Application
 				?(INT16)((pitch+(double)this->R)/(lengthPerDegree*(double)this->degreePerDivision))
 				:(INT16)((pitch+(double)this->R)/(lengthPerDegree*(double)this->degreePerDivision)-1);
 
+			//处理边界情况…………暂时先这样处理吧
+			if(((pitch-(double)this->R)/(lengthPerDegree*(double)this->degreePerDivision)) == 
+				(INT16)((pitch-(double)this->R)/(lengthPerDegree*(double)this->degreePerDivision))
+				)
+			{
+				divBound.lower++;
+			}
+			if(((pitch+(double)this->R)/(lengthPerDegree*(double)this->degreePerDivision)) == 
+				(INT16)((pitch+(double)this->R)/(lengthPerDegree*(double)this->degreePerDivision))
+				)
+			{
+				divBound.upper--;
+			}
+
 			using Direct3D::v9::resource::primitive::vertex::VertexWithColor;
 
 

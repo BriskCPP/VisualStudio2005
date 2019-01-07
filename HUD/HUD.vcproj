@@ -346,6 +346,14 @@
 						RelativePath="..\Source\Application\HUD\AttitudeIndicator.h"
 						>
 					</File>
+					<File
+						RelativePath="..\Source\Application\HUD\ParameterStore.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Application\HUD\ParameterStore.h"
+						>
+					</File>
 					<Filter
 						Name="Thread"
 						>
