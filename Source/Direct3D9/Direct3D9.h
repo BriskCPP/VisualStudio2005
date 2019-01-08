@@ -215,77 +215,159 @@ namespace Direct3D
 					}
 				};
 
-
-				//the following are deprecated
-				////////////////////////////////////////
-				namespace buffer
+				//在写TriangleList之前，先定义Triangle
+				template<typename Vertex>
+				class Triangle
 				{
-					template<typename Vertex>
-					class VertexBuffer
+				private:
+					std::list<Vertex> vertexList;
+				public:
+					//重载构造函数
+					Triangle(Vertex A,Vertex B,Vertex C)
 					{
-					public:
-						VertexBuffer(
-							IDirect3DDevice9 *device,UINT length,
-							DWORD usage = D3DUSAGE_WRITEONLY,
-							D3DPOOL pool = D3DPOOL_MANAGED
+						vertexList.clear();
+						vertexList.push_back(A);
+						vertexList.push_back(B);
+						vertexList.push_back(C);
+					}
+					//复制构造函数
+					Triangle(const Triangle<Vertex> &triangle)
+					{
+						this->vertexList = triangle.getVertexList();
+					}
+
+					std::list<Vertex> getVertexList()
+					{
+						return this->vertexList;
+					}
+				};
+
+				template<typename Vertex>
+				class TriangleList
+				{
+				private:
+					UINT vertexSize;
+					IDirect3DDevice9 *device;
+					IDirect3DVertexBuffer9 *d3dVertexBuffer;
+
+					D3DXVECTOR3 center;
+					D3DXVECTOR3 translation;
+					D3DXVECTOR3 rotation;
+					D3DXVECTOR3 scale;
+				public:
+					TriangleList(IDirect3DDevice9 *device,
+						std::list<Triangle<Vertex>> triangleList,
+						DWORD usage = D3DUSAGE_WRITEONLY,
+						D3DPOOL pool = D3DPOOL_MANAGED
+						)
+					{
+						this->center = D3DXVECTOR3(0,0,0);
+						this->translation = D3DXVECTOR3(0,0,0);
+						this->rotation = D3DXVECTOR3(0,0,0);
+						this->scale = D3DXVECTOR3(1.0f,1.0f,1.0f);
+
+						this->device = device;
+
+						this->vertexSize = 3*(UINT)triangleList.size();
+						//×3是因为这个list是元素为Triangle的list
+
+						device->CreateVertexBuffer(
+							(this->vertexSize)*sizeof(Vertex),
+							usage,Vertex::flexibleVectorFormat,
+							pool,&(this->d3dVertexBuffer),0);
+
+						//向资源管理中添加这个资源，以在帧结束时自动释放
+						Direct3D::v9::resource::OneFrameLifecycleResource::getInstance()->addResource(device,this->d3dVertexBuffer);
+
+						Vertex *vertexPointer = NULL;
+						this->d3dVertexBuffer->Lock(0,0,(void **)&vertexPointer,0);
+
+						UINT index = 0;
+						for(std::list<Triangle<Vertex>>::iterator triangleListIterator = triangleList.begin();
+							triangleListIterator != triangleList.end();triangleListIterator ++
 							)
 						{
-							length = length>1048576?1048576:length;
-							device->CreateVertexBuffer(length*sizeof(Vertex),usage,Vertex::flexibleVectorFormat,pool,&(this->d3dVectorBuffer),0);
-							this->length = length;
-						}
+							std::list<Vertex> currentTriangleVertexList = triangleListIterator->getVertexList();
 
-						VertexBuffer(
-							IDirect3DDevice9 *device,std::list<Vertex> vertexList,
-							DWORD usage = D3DUSAGE_WRITEONLY,
-							D3DPOOL pool = D3DPOOL_MANAGED
-							)
-						{
-							this->length = (UINT)vertexList.size();
-							device->CreateVertexBuffer((this->length)*sizeof(Vertex),usage,Vertex::flexibleVectorFormat,pool,&(this->d3dVectorBuffer),0);
-
-
-							Vertex *vertexPointer = NULL;
-							this->d3dVectorBuffer->Lock(0,0,(void **)&vertexPointer,0);
-
-							UINT index = 0;
-							for(std::list<Vertex>::iterator vertexListIterator = vertexList.begin();
-								vertexListIterator != vertexList.end();vertexListIterator++
+							for(std::list<Vertex>::iterator vertexListIterator = currentTriangleVertexList.begin();
+								vertexListIterator != currentTriangleVertexList.end();vertexListIterator++
 								)
 							{
-								*(vertexPointer+index) = *vertexListIterator;
-								index++;
+								*(vertexPointer + index) = *vertexListIterator;
+								++index;
 							}
-							this->d3dVectorBuffer->Unlock();
+						}
+						this->d3dVertexBuffer->Unlock();
+					}
+
+					void render()
+					{
+						//apply transform
+						//0.apply Translation
+						Vertex *vertexPointer = NULL;
+						this->d3dVertexBuffer->Lock(0,0,(void **)&vertexPointer,0);
+
+						for(UINT index = 0;index < this->vertexSize;index ++)
+						{
+							vertexPointer[index].x += this->translation.x;
+							vertexPointer[index].y += this->translation.y;
+							vertexPointer[index].z += this->translation.z;
+						}
+						this->center += this->translation;//平移中心
+
+						//1.apply rotation
+						for(UINT index = 0;index < this->vertexSize;index ++)
+						{
+							D3DXVECTOR3 relative;//相对于旋转和缩放中心的相对矢量
+							relative.x = vertexPointer[index].x - this->center.x;
+							relative.y = vertexPointer[index].y - this->center.y;
+							relative.z = vertexPointer[index].z - this->center.z;
+							//对相对矢量进行旋转
+							D3DXVECTOR3 rotated = Direct3D::v9::resource::vector::rotate(relative,this->rotation);
+
+							vertexPointer[index].x = this->center.x + rotated.x;
+							vertexPointer[index].y = this->center.y + rotated.y;
+							vertexPointer[index].z = this->center.z + rotated.z;
 						}
 
-						UINT getLength()
+						//2.apply Scale
+						for(UINT index = 0;index < this->vertexSize;index ++)
 						{
-							return this->length;
-						}
+							D3DXVECTOR3 relative;//相对于旋转和缩放中心的相对矢量
+							relative.x = vertexPointer[index].x - this->center.x;
+							relative.y = vertexPointer[index].y - this->center.y;
+							relative.z = vertexPointer[index].z - this->center.z;
 
-						Vertex *lock()
-						{
-							Vertex *vertexPointer = NULL;
-							this->d3dVectorBuffer->Lock(0,0,(void **)&vertexPointer,0);
-							return vertexPointer;
+							vertexPointer[index].x = this->center.x + relative.x*this->scale.x;
+							vertexPointer[index].y = this->center.y + relative.y*this->scale.y;
+							vertexPointer[index].z = this->center.z + relative.z*this->scale.z;
 						}
-						void unlock()
-						{
-							this->d3dVectorBuffer->Unlock();
-						}
+						this->d3dVertexBuffer->Unlock();
 
-						IDirect3DVertexBuffer9 *getDirect3D9VertexBufferPointer()
-						{
-							return this->d3dVectorBuffer;
-						}
+						//3.render
+						this->device->SetStreamSource(0,this->d3dVertexBuffer,0,sizeof(Vertex));
+						this->device->SetFVF(Vertex::flexibleVectorFormat);
+						//按TriangleList绘制，所以图元数量当然是Vertex数量的三分之一
+						this->device->DrawPrimitive(D3DPT_TRIANGLELIST,0,this->vertexSize/3);
+					}
 
-					private:
-						IDirect3DVertexBuffer9 *d3dVectorBuffer;
-						UINT length;
-					};
-					//////////////////////////////////////////////////////////
-				}
+					void setCenter(D3DXVECTOR3 center)
+					{
+						this->center = center;
+					}
+					void setTranslation(D3DXVECTOR3 translation)
+					{
+						this->translation = translation;
+					}
+					void setRotation(D3DXVECTOR3 rotation)
+					{
+						this->rotation = rotation;
+					}
+					void setScale(D3DXVECTOR3 scale)
+					{
+						this->scale = scale;
+					}
+				};
 			}
 
 			

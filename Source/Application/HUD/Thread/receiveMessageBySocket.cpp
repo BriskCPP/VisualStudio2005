@@ -88,7 +88,7 @@ namespace Application
 				*/
 
 				SOCKET serverSocket = openServerSocket(*((unsigned short *)parameters.find(std::string("ServerPort"))->second));
-				std::queue<std::list<UINT32>> *messageQueue = (std::queue<std::list<UINT32>> *)(parameters.find(std::string("MessageQueue"))->second);
+				//std::queue<std::list<UINT32>> *messageQueue = (std::queue<std::list<UINT32>> *)(parameters.find(std::string("MessageQueue"))->second);
 
 				while (true)
 				{
