@@ -199,7 +199,7 @@ namespace Direct3D
 					//创建字体
 					HDC hdc = CreateCompatibleDC(0);//创建环境
 					HFONT originalFont = (HFONT)SelectObject(hdc,hFont);//将字体选入设备环境,返回上一个字体，以备重新选择
-					D3DXCreateText(device,hdc,(LPCWSTR)tempContent,0.001f*0.001f,//这是最小值了  再小就出Bug了
+					D3DXCreateText(device,hdc,(LPCWSTR)tempContent,0.001f,//这是最小值了  再小就出Bug了
 						(0.001f*0.001f*0.001f*0.001f*0.001f*0.001f*0.001f*0.001f),
 						&d3dxMesh,NULL,NULL);//创建文本网格
 					SelectObject(hdc,originalFont);//选择原来的字体
