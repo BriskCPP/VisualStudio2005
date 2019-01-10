@@ -113,9 +113,31 @@ namespace Application
 					translationWithoutRotation, D3DXVECTOR3(0.0f,0.0f,((float)this->roll/180)*D3DX_PI)));
 				currentDegreeTextMesh.setScale(D3DXVECTOR3(100,100,0.001f));
 				currentDegreeTextMesh.setRotation(D3DXVECTOR3(0.0f,0.0f,((float)this->roll/180)*D3DX_PI));
-				//还没有设置缩放
 				currentDegreeTextMesh.render();
 			}
+
+			//1.用于指示滚转的小三角形
+			struct VertexWithColor tempVertexArray[4];
+			tempVertexArray[0].y = 0-(float)this->R;
+			tempVertexArray[1].y = 0-(float)this->R;
+			tempVertexArray[2].y = (float)-1.1*(float)this->R;
+			tempVertexArray[0].x = (float)-0.05*(float)this->R;
+			tempVertexArray[1].x = (float)0.05*(float)this->R;
+			tempVertexArray[2].x = 0;
+			tempVertexArray[0].z = (float)this->Z;
+			tempVertexArray[1].z = (float)this->Z;
+			tempVertexArray[2].z = (float)this->Z;
+
+			horizontalLineVertexList.push_back(
+				std::pair<struct VertexWithColor,struct VertexWithColor>(tempVertexArray[0],tempVertexArray[1])
+				);
+			horizontalLineVertexList.push_back(
+				std::pair<struct VertexWithColor,struct VertexWithColor>(tempVertexArray[1],tempVertexArray[2])
+				);
+			horizontalLineVertexList.push_back(
+				std::pair<struct VertexWithColor,struct VertexWithColor>(tempVertexArray[2],tempVertexArray[0])
+				);
+
 
 
 			Direct3D::v9::resource::primitive::LineList<struct VertexWithColor> horizontalLineList = 
@@ -123,35 +145,65 @@ namespace Application
 			horizontalLineList.setRotation(D3DXVECTOR3(0,0,((float)this->roll/180)*D3DX_PI));
 			horizontalLineList.render();
 
-			//中间的+要单独生成并渲染，否则…………会跟随着滚转一起旋转
-			struct VertexWithColor vertexArray[4];//这是在栈上开辟的，自动管理，所以不用释放
-			vertexArray[0].color = D3DCOLOR_XRGB(0,0xff,0);
-			vertexArray[1].color = D3DCOLOR_XRGB(0,0xff,0);
-			vertexArray[2].color = D3DCOLOR_XRGB(0,0xff,0);
-			vertexArray[3].color = D3DCOLOR_XRGB(0,0xff,0);
+			//2.中间的+要单独生成并渲染，否则…………会跟随着滚转一起旋转
+			tempVertexArray[0].color = D3DCOLOR_XRGB(0,0xff,0);
+			tempVertexArray[1].color = D3DCOLOR_XRGB(0,0xff,0);
+			tempVertexArray[2].color = D3DCOLOR_XRGB(0,0xff,0);
+			tempVertexArray[3].color = D3DCOLOR_XRGB(0,0xff,0);
 
-			vertexArray[0].x = (float)(-0.05*(float)this->R);
-			vertexArray[1].x = (float)(0.05*(float)this->R);
-			vertexArray[2].y = (float)(-0.05*(float)this->R);
-			vertexArray[3].y = (float)(0.05*(float)this->R);
+			tempVertexArray[0].x = (float)(-0.05*(float)this->R);
+			tempVertexArray[1].x = (float)(0.05*(float)this->R);
+			tempVertexArray[2].y = (float)(-0.05*(float)this->R);
+			tempVertexArray[3].y = (float)(0.05*(float)this->R);
 
-			vertexArray[0].y = 0;
-			vertexArray[1].y = 0;
-			vertexArray[2].x = 0;
-			vertexArray[3].x = 0;
+			tempVertexArray[0].y = 0;
+			tempVertexArray[1].y = 0;
+			tempVertexArray[2].x = 0;
+			tempVertexArray[3].x = 0;
 
 			//我只是真的不想命名了，仅此而已
 			for(UINT8 aaaaaaaaa = 0;aaaaaaaaa <4;aaaaaaaaa++)
 			{
-				vertexArray[aaaaaaaaa].z = (float)this->Z;
-				vertexArray[aaaaaaaaa].color = D3DCOLOR_XRGB(0,0xff,0);
+				tempVertexArray[aaaaaaaaa].z = (float)this->Z;
+				tempVertexArray[aaaaaaaaa].color = D3DCOLOR_XRGB(0,0xff,0);
 			}
 
 			std::list<std::pair<struct VertexWithColor,struct VertexWithColor>> aaaaaaaaaaaaaa;
 			//没错，我又懒得命名了
 			aaaaaaaaaaaaaa.clear();
-			aaaaaaaaaaaaaa.push_back(std::pair<struct VertexWithColor,struct VertexWithColor>(vertexArray[0],vertexArray[1]));
-			aaaaaaaaaaaaaa.push_back(std::pair<struct VertexWithColor,struct VertexWithColor>(vertexArray[2],vertexArray[3]));
+			aaaaaaaaaaaaaa.push_back(std::pair<struct VertexWithColor,struct VertexWithColor>(tempVertexArray[0],tempVertexArray[1]));
+			aaaaaaaaaaaaaa.push_back(std::pair<struct VertexWithColor,struct VertexWithColor>(tempVertexArray[2],tempVertexArray[3]));
+
+			//3.下面的圆弧
+			for(UINT i = 0;180+45+0.2*(float)i<270+45;i++)
+			{
+				//绘制从i到(i+1)的线段
+				tempVertexArray[0].x = (float)1.1*(float)this->R*cos((float)((180+45+0.2*i)*D3DX_PI)/180);
+				tempVertexArray[0].y = (float)1.1*(float)this->R*sin((float)((180+45+0.2*i)*D3DX_PI)/180);
+				tempVertexArray[0].z = (float)this->Z;
+
+				tempVertexArray[1].x = (float)1.1*(float)this->R*cos((float)((180+45+0.2*(i+1))*D3DX_PI)/180);
+				tempVertexArray[1].y = (float)1.1*(float)this->R*sin((float)((180+45+0.2*(i+1))*D3DX_PI)/180);
+				tempVertexArray[1].z = (float)this->Z;
+
+				aaaaaaaaaaaaaa.push_back(
+					std::pair<struct VertexWithColor,struct VertexWithColor>(tempVertexArray[0],tempVertexArray[1])
+					);
+			}
+			for(UINT i = 180+45;i <= 270+45;i += 5)
+			{
+				tempVertexArray[0].x = (float)1.1*(float)this->R*cos(((float)i*D3DX_PI)/180);
+				tempVertexArray[0].y = (float)1.1*(float)this->R*sin(((float)i*D3DX_PI)/180);
+				tempVertexArray[0].z = (float)this->Z;
+
+				tempVertexArray[1].x = (float)1.15*(float)this->R*cos(((float)i*D3DX_PI)/180);
+				tempVertexArray[1].y = (float)1.15*(float)this->R*sin(((float)i*D3DX_PI)/180);
+				tempVertexArray[1].z = (float)this->Z;
+
+				aaaaaaaaaaaaaa.push_back(
+					std::pair<struct VertexWithColor,struct VertexWithColor>(tempVertexArray[0],tempVertexArray[1])
+					);
+			}
 
 			Direct3D::v9::resource::primitive::LineList<struct VertexWithColor>(device,aaaaaaaaaaaaaa).render();
 

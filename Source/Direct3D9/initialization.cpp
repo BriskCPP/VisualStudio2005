@@ -21,14 +21,25 @@ namespace Direct3D
 				HRESULT hResult = direct3D9->CreateDevice(D3DADAPTER_DEFAULT, deviceType, hwnd, byHardwareOrSoftware, &presentParameters, device);
 				if (FAILED(hResult))
 				{
-					presentParameters.AutoDepthStencilFormat = D3DFMT_D16;
+					presentParameters.MultiSampleType = D3DMULTISAMPLE_8_SAMPLES;
 					hResult = direct3D9->CreateDevice(D3DADAPTER_DEFAULT, deviceType, hwnd, byHardwareOrSoftware, &presentParameters, device);
-					if (FAILED(hResult))
+					if(FAILED(hResult))
 					{
-						MessageBoxA(0, "Direct3D9CreateDeviceFailed", 0, 0);
-						//释放资源
-						direct3D9->Release();
-						return false;
+						presentParameters.AutoDepthStencilFormat = D3DFMT_D16;
+						presentParameters.MultiSampleType = D3DMULTISAMPLE_4_SAMPLES;
+						hResult = direct3D9->CreateDevice(D3DADAPTER_DEFAULT, deviceType, hwnd, byHardwareOrSoftware, &presentParameters, device);
+						if (FAILED(hResult))
+						{
+							presentParameters.MultiSampleType = D3DMULTISAMPLE_NONE;
+							hResult = direct3D9->CreateDevice(D3DADAPTER_DEFAULT, deviceType, hwnd, byHardwareOrSoftware, &presentParameters, device);
+							if (FAILED(hResult))
+							{
+								MessageBoxA(0, "Direct3D9CreateDeviceFailed", 0, 0);
+								//释放资源
+								direct3D9->Release();
+								return false;
+							}
+						}
 					}
 				}
 				direct3D9->Release();
@@ -102,7 +113,8 @@ namespace Direct3D
 				presentParameters.BackBufferHeight = height;
 				presentParameters.BackBufferFormat = D3DFMT_A8R8G8B8;
 				presentParameters.BackBufferCount = 1;
-				presentParameters.MultiSampleType = D3DMULTISAMPLE_NONE;
+				//presentParameters.MultiSampleType = D3DMULTISAMPLE_NONE;
+				presentParameters.MultiSampleType = D3DMULTISAMPLE_16_SAMPLES;;
 				presentParameters.MultiSampleQuality = 0;
 				presentParameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
 				presentParameters.hDeviceWindow = hwnd;
