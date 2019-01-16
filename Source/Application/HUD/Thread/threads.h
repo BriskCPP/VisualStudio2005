@@ -23,6 +23,7 @@ namespace Application
 		namespace Thread
 		{
 			DWORD WINAPI receiveMessageBySocket(LPVOID lpParam);
+			DWORD WINAPI receiveDataFrom1553B(LPVOID lpParam);
 		}
 	}
 }

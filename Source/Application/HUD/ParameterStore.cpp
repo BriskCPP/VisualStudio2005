@@ -87,5 +87,15 @@ namespace Application
 		{
 			return this->yaw;
 		}
+
+		//
+		void ParameterStore::setPitch(double pitch)
+		{
+			this->pitch = pitch;
+		}
+		void ParameterStore::setRoll(double roll)
+		{
+			this->roll = roll;
+		}
 	}
 }

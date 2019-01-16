@@ -25,6 +25,12 @@ namespace Application
 			//下面这两个还没有实现
 			UINT16 getHeight();//11
 			UINT16 getSpeed();//12
+
+			//下面这几个setter method本来是不想加的
+			//但是为了1553B只好免为其难…………
+			void setPitch(double pitch);
+			void setRoll(double roll);
+
 		private:
 			double pitch,roll,yaw;
 			
