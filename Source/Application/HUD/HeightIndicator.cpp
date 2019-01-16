@@ -28,9 +28,9 @@ namespace Application
 		void HeightIndicator::render(IDirect3DDevice9 *device)
 		{
 			//如果meter正好在一个分隔上的话…………
-			struct {float lower,upper;} metersBound;
-			metersBound.lower = this->meters - ((float)(this->numberOfDivisionToDisplay * this->metersPerDiv)/2);
-			metersBound.upper = this->meters + ((float)(this->numberOfDivisionToDisplay * this->metersPerDiv)/2);
+			struct {double lower,upper;} metersBound;
+			metersBound.lower = this->meters - ((double)(this->numberOfDivisionToDisplay * this->metersPerDiv)*0.501);
+			metersBound.upper = this->meters + ((double)(this->numberOfDivisionToDisplay * this->metersPerDiv)*0.501);
 			//如果正好等于边界那就一起画，这个和AttitudeIndicator不同  并不需要想太多
 
 			struct {INT16 lower,upper;} divIndexBound;
@@ -103,8 +103,8 @@ namespace Application
 				Direct3D::v9::resource::mesh::text::TextMesh currentText = 
 					Direct3D::v9::resource::mesh::MeshFactory::createTextMesh(device,currentDivisionText,std::string("Microsoft YaHei"));
 				currentText.setTranslation(D3DXVECTOR3(this->displayCenter.x+0.35f*displayWidth,y,this->displayCenter.z));
-				//currentText.setSideLength(D3DXVECTOR3(this->displayWidth*0.3,0.2f*(this->displayHeight/numberOfDivisionToDisplay),0.001f));
-				currentText.setScale(D3DXVECTOR3(60,60,0.000001f));
+				currentText.setSideLength(D3DXVECTOR3(this->displayWidth,0.15f*(this->displayHeight/numberOfDivisionToDisplay),0.001f));
+				//currentText.setScale(D3DXVECTOR3(60,60,0.000001f));
 				currentText.render();
 
 
@@ -135,5 +135,6 @@ namespace Application
 
 			horizontalLineList.render();
 		}
+
 	}
 }

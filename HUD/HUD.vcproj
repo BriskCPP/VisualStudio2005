@@ -291,7 +291,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="d3d9.lib d3dx9.lib winmm.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)Library&quot;;&quot;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -347,6 +347,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\Source\Application\HUD\HeadingIndicator.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Application\HUD\HeadingIndicator.h"
+						>
+					</File>
+					<File
 						RelativePath="..\Source\Application\HUD\HeightIndicator.cpp"
 						>
 					</File>
@@ -355,11 +363,27 @@
 						>
 					</File>
 					<File
+						RelativePath="..\Source\Application\HUD\MachIndicator.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Application\HUD\MachIndicator.h"
+						>
+					</File>
+					<File
 						RelativePath="..\Source\Application\HUD\ParameterStore.cpp"
 						>
 					</File>
 					<File
 						RelativePath="..\Source\Application\HUD\ParameterStore.h"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Application\HUD\SpeedIndicator.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Application\HUD\SpeedIndicator.h"
 						>
 					</File>
 					<Filter

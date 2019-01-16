@@ -111,7 +111,7 @@ namespace Application
 
 				currentDegreeTextMesh.setTranslation(Direct3D::v9::resource::vector::rotate(
 					translationWithoutRotation, D3DXVECTOR3(0.0f,0.0f,((float)this->roll/180)*D3DX_PI)));
-				currentDegreeTextMesh.setScale(D3DXVECTOR3(100,100,0.001f));
+				currentDegreeTextMesh.setScale(D3DXVECTOR3(80,80,0.001f));
 				currentDegreeTextMesh.setRotation(D3DXVECTOR3(0.0f,0.0f,((float)this->roll/180)*D3DX_PI));
 				currentDegreeTextMesh.render();
 			}
@@ -209,7 +209,7 @@ namespace Application
 
 		}
 		//the following methods are setters
-		AttitudeIndicator::AttitudeIndicator(UINT8 fieldAngle, UINT8 degreePerDivision, UINT R /* = 600 */,UINT Z /* = 1000 */)
+		AttitudeIndicator::AttitudeIndicator(UINT8 fieldAngle, UINT8 degreePerDivision, UINT R /* = 500 */,UINT Z /* = 1000 */)
 		{
 			this->fieldAngle = fieldAngle;
 			this->degreePerDivision = degreePerDivision;

@@ -13,7 +13,7 @@ namespace Application
 			AttitudeIndicator(
 				UINT8 fieldAngle,
 				UINT8 anglePerDivision,
-				UINT R = 600,UINT Z = 1000);
+				UINT R = 500,UINT Z = 1000);
 
 			//以角度为单位设置俯仰角，会被统一到±90之内
 			void setPitch(double pitch);
