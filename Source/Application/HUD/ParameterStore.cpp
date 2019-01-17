@@ -9,6 +9,10 @@ namespace Application
 			this->pitch = 0;
 			this->roll = 0;
 			this->yaw = 0;
+
+			this->height = 0;
+			this->speed = 0;
+			this->mach = 0;
 		}
 		ParameterStore *ParameterStore::instance = NULL;
 		ParameterStore *ParameterStore::getInstance()
@@ -87,8 +91,20 @@ namespace Application
 		{
 			return this->yaw;
 		}
+		double ParameterStore::getHeight()
+		{
+			return this->height;
+		}
+		double ParameterStore::getSpeed()
+		{
+			return this->speed;
+		}
+		double ParameterStore::getMach()
+		{
+			return this->mach;
+		}
 
-		//
+		//setter methods are listed as follows
 		void ParameterStore::setPitch(double pitch)
 		{
 			this->pitch = pitch;
@@ -96,6 +112,26 @@ namespace Application
 		void ParameterStore::setRoll(double roll)
 		{
 			this->roll = roll;
+		}
+		void ParameterStore::setYaw(double yaw)
+		{
+			this->yaw = yaw;
+		}
+		void ParameterStore::setHeight(double height)
+		{
+			this->height = height;
+		}
+		void ParameterStore::setSpeed(double speed)
+		{
+			this->speed = speed;
+		}
+		void ParameterStore::setMach(double mach)
+		{
+			this->mach = mach;
+		}
+		void ParameterStore::setMach(UINT16 mach)
+		{
+			this->mach = ((double)mach)/100;//两位的定点小数
 		}
 	}
 }

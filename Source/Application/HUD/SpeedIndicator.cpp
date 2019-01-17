@@ -17,6 +17,9 @@ namespace Application
 			if(speedBound.lower > 0) divIndexBound.lower++;
 			if(speedBound.upper < 0) divIndexBound.upper--;
 
+			//这一句是为了修正…………你什么时候见过速度为负值
+			divIndexBound.lower = divIndexBound.lower < 0?0:divIndexBound.lower;
+
 			char buffer[64] = {0};
 			sprintf_s(buffer,"%hu",this->speed);
 			std::string currentHeightText("");
